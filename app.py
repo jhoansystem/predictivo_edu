@@ -6,9 +6,6 @@ import joblib
 import plotly.express as px
 import plotly.graph_objects as go
 
-# Get directory of the current script to resolve relative paths robustly
-base_dir = os.path.dirname(os.path.abspath(__file__))
-
 # Set page configuration with a premium look
 st.set_page_config(
     page_title="PredictivoEdu - Analítica Predictiva Escolar",
@@ -53,7 +50,7 @@ st.markdown("""
 # Helper function to load dataset
 @st.cache_data
 def load_data():
-    path = os.path.join(base_dir, "resultados_estudiantes.csv")
+    path = "resultados_estudiantes.csv"
     if os.path.exists(path):
         df = pd.read_csv(path, sep=';')
         return df
@@ -253,10 +250,10 @@ elif page == "🔮 Modelado Predictivo":
     # Load Models and Scalers
     models_loaded = False
     try:
-        lr_model = joblib.load(os.path.join(base_dir, 'modelo_lineal.joblib'))
-        scaler_reg = joblib.load(os.path.join(base_dir, 'scaler_lineal.joblib'))
-        log_model = joblib.load(os.path.join(base_dir, 'modelo_logistico.joblib'))
-        scaler_clf = joblib.load(os.path.join(base_dir, 'scaler_logistico.joblib'))
+        lr_model = joblib.load('modelo_lineal.joblib')
+        scaler_reg = joblib.load('scaler_lineal.joblib')
+        log_model = joblib.load('modelo_logistico.joblib')
+        scaler_clf = joblib.load('scaler_logistico.joblib')
         models_loaded = True
     except Exception as e:
         st.error(f"Error al cargar los archivos .joblib del modelo: {e}")
