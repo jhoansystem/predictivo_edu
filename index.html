@@ -1,0 +1,1728 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Sistema de Alerta Temprana Académica basado en Machine Learning. Predicción del rendimiento estudiantil en educación secundaria colombiana usando Regresión Lineal, Logística y Árboles de Decisión.">
+  <meta name="keywords" content="Machine Learning, educación, Colombia, alerta temprana, predicción académica, CRISP-ML, Talento Tech">
+  <meta name="author" content="Talento Tech Colombia">
+  <title>Sistema de Alerta Temprana Académica | Machine Learning</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    /* ============================================
+       RESET & BASE
+       ============================================ */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-primary: #0a192f;
+      --bg-secondary: #112240;
+      --bg-tertiary: #1d3461;
+      --accent: #64ffda;
+      --accent-dim: rgba(100, 255, 218, 0.1);
+      --accent-glow: rgba(100, 255, 218, 0.3);
+      --text-primary: #ccd6f6;
+      --text-secondary: #8892b0;
+      --text-white: #e6f1ff;
+      --glass-bg: rgba(17, 34, 64, 0.6);
+      --glass-border: rgba(100, 255, 218, 0.15);
+      --glass-shadow: rgba(0, 0, 0, 0.3);
+      --gradient-1: #667eea;
+      --gradient-2: #764ba2;
+      --warning-orange: #f59e0b;
+      --success-green: #10b981;
+      --info-blue: #3b82f6;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      font-size: 16px;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* ============================================
+       SCROLLBAR
+       ============================================ */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg-primary); }
+    ::-webkit-scrollbar-thumb {
+      background: var(--bg-tertiary);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+    /* ============================================
+       NAVIGATION
+       ============================================ */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+      padding: 1rem 2rem;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(0px);
+    }
+
+    nav.scrolled {
+      background: rgba(10, 25, 47, 0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--glass-border);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      padding: 0.6rem 2rem;
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav-logo {
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: var(--accent);
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .nav-logo svg {
+      width: 28px;
+      height: 28px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      transition: color 0.3s ease;
+      position: relative;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--accent);
+      transition: width 0.3s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--accent);
+    }
+
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+
+    .nav-toggle {
+      display: none;
+      flex-direction: column;
+      cursor: pointer;
+      gap: 5px;
+    }
+
+    .nav-toggle span {
+      width: 25px;
+      height: 2px;
+      background: var(--accent);
+      transition: all 0.3s ease;
+    }
+
+    /* ============================================
+       HERO SECTION
+       ============================================ */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      padding: 2rem;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, #0a192f 0%, #112240 25%, #1a1a4e 50%, #0d2137 75%, #0a192f 100%);
+      background-size: 400% 400%;
+      animation: gradientShift 15s ease infinite;
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .hero-particles {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      background: var(--accent);
+      opacity: 0;
+      animation: floatParticle linear infinite;
+    }
+
+    @keyframes floatParticle {
+      0% {
+        transform: translateY(100vh) scale(0);
+        opacity: 0;
+      }
+      10% { opacity: 0.6; }
+      90% { opacity: 0.6; }
+      100% {
+        transform: translateY(-10vh) scale(1);
+        opacity: 0;
+      }
+    }
+
+    .hero-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(100, 255, 218, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(100, 255, 218, 0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      animation: gridMove 20s linear infinite;
+    }
+
+    @keyframes gridMove {
+      0% { transform: translate(0, 0); }
+      100% { transform: translate(60px, 60px); }
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      max-width: 900px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--accent-dim);
+      border: 1px solid var(--glass-border);
+      border-radius: 50px;
+      padding: 0.5rem 1.2rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      backdrop-filter: blur(10px);
+      animation: fadeInDown 0.8s ease forwards;
+      opacity: 0;
+    }
+
+    .hero-badge .pulse-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.5); }
+    }
+
+    .hero h1 {
+      font-size: clamp(2.2rem, 5vw, 4rem);
+      font-weight: 900;
+      color: var(--text-white);
+      line-height: 1.1;
+      margin-bottom: 1.5rem;
+      letter-spacing: -2px;
+      animation: fadeInUp 1s ease 0.2s forwards;
+      opacity: 0;
+    }
+
+    .hero h1 .gradient-text {
+      background: linear-gradient(135deg, var(--accent), var(--gradient-1), var(--accent));
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shimmer 3s linear infinite;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: 0% center; }
+      100% { background-position: 200% center; }
+    }
+
+    .hero-subtitle {
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      color: var(--text-secondary);
+      max-width: 650px;
+      margin: 0 auto 2.5rem;
+      font-weight: 400;
+      line-height: 1.8;
+      animation: fadeInUp 1s ease 0.4s forwards;
+      opacity: 0;
+    }
+
+    .hero-stats {
+      display: flex;
+      justify-content: center;
+      gap: 3rem;
+      flex-wrap: wrap;
+      animation: fadeInUp 1s ease 0.6s forwards;
+      opacity: 0;
+    }
+
+    .hero-stat {
+      text-align: center;
+    }
+
+    .hero-stat .number {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--accent);
+      display: block;
+      letter-spacing: -1px;
+    }
+
+    .hero-stat .label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      font-weight: 500;
+    }
+
+    .hero-scroll-indicator {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      animation: bounce 2s ease-in-out infinite;
+      cursor: pointer;
+      z-index: 2;
+    }
+
+    .hero-scroll-indicator svg {
+      width: 24px;
+      height: 24px;
+      stroke: var(--accent);
+      opacity: 0.6;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(10px); }
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ============================================
+       SHARED SECTION STYLES
+       ============================================ */
+    section {
+      padding: 6rem 2rem;
+      position: relative;
+    }
+
+    .section-container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 0.75rem;
+    }
+
+    .section-label::before {
+      content: '';
+      display: inline-block;
+      width: 30px;
+      height: 2px;
+      background: var(--accent);
+    }
+
+    .section-title {
+      font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+      font-weight: 800;
+      color: var(--text-white);
+      letter-spacing: -1.5px;
+      margin-bottom: 1rem;
+      line-height: 1.2;
+    }
+
+    .section-desc {
+      font-size: 1.05rem;
+      color: var(--text-secondary);
+      max-width: 650px;
+      line-height: 1.8;
+      margin-bottom: 3rem;
+    }
+
+    /* Reveal animation */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .reveal.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+
+    /* ============================================
+       GLASS CARD
+       ============================================ */
+    .glass-card {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      padding: 2rem;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 8px 32px var(--glass-shadow);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .glass-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(100, 255, 218, 0.3);
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4), 0 0 40px var(--accent-dim);
+    }
+
+    /* ============================================
+       SECTION: PROPÓSITO Y OBJETIVO
+       ============================================ */
+    #proposito {
+      background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+    }
+
+    .objetivo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .objetivo-card {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .objetivo-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--gradient-1));
+    }
+
+    .objetivo-card .card-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.2rem;
+      background: var(--accent-dim);
+      border: 1px solid var(--glass-border);
+    }
+
+    .objetivo-card .card-icon svg {
+      width: 28px;
+      height: 28px;
+      stroke: var(--accent);
+      fill: none;
+      stroke-width: 1.5;
+    }
+
+    .objetivo-card h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-white);
+      margin-bottom: 0.75rem;
+    }
+
+    .objetivo-card p {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    .data-highlights {
+      display: flex;
+      gap: 1.5rem;
+      margin-top: 2.5rem;
+      flex-wrap: wrap;
+    }
+
+    .data-highlight {
+      flex: 1;
+      min-width: 180px;
+      text-align: center;
+      padding: 1.5rem;
+      background: var(--accent-dim);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+    }
+
+    .data-highlight .dh-number {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--accent);
+      display: block;
+    }
+
+    .data-highlight .dh-label {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-top: 0.3rem;
+    }
+
+    /* ============================================
+       SECTION: EL PROBLEMA EDUCATIVO
+       ============================================ */
+    #problema {
+      background: var(--bg-secondary);
+      overflow: hidden;
+    }
+
+    .problema-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: center;
+    }
+
+    .problema-text h2 {
+      margin-bottom: 1.5rem;
+    }
+
+    .problema-text p {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.8;
+      margin-bottom: 1rem;
+    }
+
+    .problema-text .highlight-box {
+      background: rgba(245, 158, 11, 0.08);
+      border-left: 3px solid var(--warning-orange);
+      padding: 1rem 1.2rem;
+      border-radius: 0 10px 10px 0;
+      margin-top: 1.5rem;
+    }
+
+    .problema-text .highlight-box p {
+      color: var(--warning-orange);
+      font-weight: 500;
+      margin: 0;
+    }
+
+    .problema-visual {
+      position: relative;
+    }
+
+    .problema-visual .visual-circle {
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, rgba(100, 255, 218, 0.12), transparent 70%);
+      border: 1px solid var(--glass-border);
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      animation: rotateGlow 8s linear infinite;
+    }
+
+    @keyframes rotateGlow {
+      0% { box-shadow: 0 0 40px rgba(100, 255, 218, 0.05); }
+      50% { box-shadow: 0 0 60px rgba(100, 255, 218, 0.15); }
+      100% { box-shadow: 0 0 40px rgba(100, 255, 218, 0.05); }
+    }
+
+    .visual-circle .inner-circle {
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(20px);
+    }
+
+    .inner-circle .big-percent {
+      font-size: 3rem;
+      font-weight: 900;
+      color: var(--accent);
+      line-height: 1;
+    }
+
+    .inner-circle .percent-label {
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      text-align: center;
+      margin-top: 0.3rem;
+    }
+
+    .orbit-item {
+      position: absolute;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      padding: 0.6rem 1rem;
+      font-size: 0.72rem;
+      color: var(--text-primary);
+      font-weight: 600;
+      backdrop-filter: blur(10px);
+      white-space: nowrap;
+    }
+
+    .orbit-item:nth-child(3) { top: -10px; right: 10px; }
+    .orbit-item:nth-child(4) { bottom: 20px; left: -30px; }
+    .orbit-item:nth-child(5) { top: 40%; right: -40px; }
+    .orbit-item:nth-child(6) { bottom: -10px; right: 30px; }
+
+    /* ============================================
+       SECTION: MODELOS ML
+       ============================================ */
+    #modelos {
+      background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+    }
+
+    .modelos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .modelo-card {
+      position: relative;
+      overflow: hidden;
+      padding: 2.5rem 2rem;
+    }
+
+    .modelo-card .modelo-number {
+      position: absolute;
+      top: -10px;
+      right: 15px;
+      font-size: 6rem;
+      font-weight: 900;
+      color: rgba(100, 255, 218, 0.04);
+      line-height: 1;
+      pointer-events: none;
+    }
+
+    .modelo-card .modelo-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+
+    .modelo-card:nth-child(1) .modelo-icon {
+      background: linear-gradient(135deg, rgba(100, 255, 218, 0.15), rgba(100, 255, 218, 0.05));
+    }
+    .modelo-card:nth-child(2) .modelo-icon {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(102, 126, 234, 0.05));
+    }
+    .modelo-card:nth-child(3) .modelo-icon {
+      background: linear-gradient(135deg, rgba(118, 75, 162, 0.2), rgba(118, 75, 162, 0.05));
+    }
+
+    .modelo-card .modelo-icon svg {
+      width: 30px;
+      height: 30px;
+      stroke-width: 1.5;
+    }
+
+    .modelo-card:nth-child(1) .modelo-icon svg { stroke: var(--accent); }
+    .modelo-card:nth-child(2) .modelo-icon svg { stroke: var(--gradient-1); }
+    .modelo-card:nth-child(3) .modelo-icon svg { stroke: var(--gradient-2); }
+
+    .modelo-card .modelo-type {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 0.5rem;
+    }
+
+    .modelo-card:nth-child(1) .modelo-type { color: var(--accent); }
+    .modelo-card:nth-child(2) .modelo-type { color: var(--gradient-1); }
+    .modelo-card:nth-child(3) .modelo-type { color: var(--gradient-2); }
+
+    .modelo-card h3 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-white);
+      margin-bottom: 0.75rem;
+    }
+
+    .modelo-card p {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      line-height: 1.7;
+    }
+
+    .modelo-tag {
+      display: inline-block;
+      margin-top: 1.2rem;
+      padding: 0.35rem 0.9rem;
+      border-radius: 50px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .modelo-card:nth-child(1) .modelo-tag {
+      background: rgba(100, 255, 218, 0.1);
+      color: var(--accent);
+      border: 1px solid rgba(100, 255, 218, 0.2);
+    }
+    .modelo-card:nth-child(2) .modelo-tag {
+      background: rgba(102, 126, 234, 0.1);
+      color: var(--gradient-1);
+      border: 1px solid rgba(102, 126, 234, 0.2);
+    }
+    .modelo-card:nth-child(3) .modelo-tag {
+      background: rgba(118, 75, 162, 0.1);
+      color: var(--gradient-2);
+      border: 1px solid rgba(118, 75, 162, 0.2);
+    }
+
+    /* ============================================
+       SECTION: TABLA DE VARIABLES
+       ============================================ */
+    #variables {
+      background: var(--bg-primary);
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+      border-radius: 16px;
+      border: 1px solid var(--glass-border);
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 8px 32px var(--glass-shadow);
+    }
+
+    .variables-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    .variables-table thead {
+      background: rgba(100, 255, 218, 0.06);
+    }
+
+    .variables-table thead th {
+      padding: 1.1rem 1.5rem;
+      text-align: left;
+      font-weight: 700;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--accent);
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .variables-table tbody tr {
+      transition: background 0.3s ease;
+      border-bottom: 1px solid rgba(100, 255, 218, 0.05);
+    }
+
+    .variables-table tbody tr:last-child {
+      border-bottom: none;
+    }
+
+    .variables-table tbody tr:hover {
+      background: rgba(100, 255, 218, 0.04);
+    }
+
+    .variables-table td {
+      padding: 0.9rem 1.5rem;
+      vertical-align: middle;
+    }
+
+    .variables-table .var-name {
+      font-weight: 600;
+      color: var(--text-white);
+      font-family: 'Inter', monospace;
+      font-size: 0.85rem;
+    }
+
+    .var-type-badge {
+      display: inline-block;
+      padding: 0.2rem 0.7rem;
+      border-radius: 50px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .var-type-badge.numeric {
+      background: rgba(59, 130, 246, 0.12);
+      color: var(--info-blue);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+    }
+
+    .var-type-badge.categorical {
+      background: rgba(118, 75, 162, 0.12);
+      color: var(--gradient-2);
+      border: 1px solid rgba(118, 75, 162, 0.2);
+    }
+
+    .var-type-badge.target {
+      background: rgba(100, 255, 218, 0.12);
+      color: var(--accent);
+      border: 1px solid rgba(100, 255, 218, 0.25);
+      animation: pulseGlow 2s ease-in-out infinite;
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 0 rgba(100, 255, 218, 0); }
+      50% { box-shadow: 0 0 12px rgba(100, 255, 218, 0.2); }
+    }
+
+    .variables-table .var-desc {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+    }
+
+    /* ============================================
+       SECTION: METODOLOGÍA CRISP-ML
+       ============================================ */
+    #metodologia {
+      background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+    }
+
+    .timeline {
+      position: relative;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 2px;
+      height: 100%;
+      background: linear-gradient(180deg, var(--accent), var(--gradient-1), var(--gradient-2), var(--accent));
+      opacity: 0.3;
+    }
+
+    .timeline-item {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 2.5rem;
+      position: relative;
+    }
+
+    .timeline-item:nth-child(odd) {
+      flex-direction: row;
+    }
+
+    .timeline-item:nth-child(even) {
+      flex-direction: row-reverse;
+    }
+
+    .timeline-item .timeline-content {
+      width: calc(50% - 40px);
+      padding: 1.5rem;
+    }
+
+    .timeline-item:nth-child(odd) .timeline-content {
+      text-align: right;
+      padding-right: 2rem;
+    }
+
+    .timeline-item:nth-child(even) .timeline-content {
+      text-align: left;
+      padding-left: 2rem;
+    }
+
+    .timeline-dot {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--bg-secondary);
+      border: 2px solid var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+      box-shadow: 0 0 20px var(--accent-dim);
+      flex-shrink: 0;
+    }
+
+    .timeline-dot svg {
+      width: 20px;
+      height: 20px;
+      stroke: var(--accent);
+      fill: none;
+      stroke-width: 1.5;
+    }
+
+    .timeline-phase {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--accent);
+      margin-bottom: 0.3rem;
+    }
+
+    .timeline-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-white);
+      margin-bottom: 0.4rem;
+    }
+
+    .timeline-desc {
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* ============================================
+       FOOTER
+       ============================================ */
+    footer {
+      padding: 3rem 2rem;
+      border-top: 1px solid var(--glass-border);
+      background: var(--bg-secondary);
+    }
+
+    .footer-content {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .footer-left {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .footer-logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--accent-dim);
+      border: 1px solid var(--glass-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .footer-logo svg {
+      width: 20px;
+      height: 20px;
+      stroke: var(--accent);
+      fill: none;
+    }
+
+    .footer-text {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    .footer-text strong {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .footer-right {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    .footer-right .year {
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    /* ============================================
+       RESPONSIVE
+       ============================================ */
+    @media (max-width: 900px) {
+      .problema-layout {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+
+      .problema-visual {
+        order: -1;
+      }
+
+      .visual-circle {
+        width: 250px !important;
+        height: 250px !important;
+      }
+
+      .inner-circle {
+        width: 160px !important;
+        height: 160px !important;
+      }
+
+      .inner-circle .big-percent {
+        font-size: 2.2rem !important;
+      }
+
+      .orbit-item { font-size: 0.65rem !important; padding: 0.4rem 0.7rem !important; }
+      .orbit-item:nth-child(5) { right: -10px !important; }
+      .orbit-item:nth-child(4) { left: -10px !important; }
+
+      .timeline::before { left: 24px; }
+      .timeline-item { flex-direction: row !important; }
+      .timeline-item .timeline-content {
+        width: calc(100% - 70px) !important;
+        text-align: left !important;
+        padding-left: 1.5rem !important;
+        padding-right: 0 !important;
+      }
+      .timeline-dot {
+        left: 24px !important;
+        position: relative !important;
+        transform: none !important;
+        flex-shrink: 0;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .nav-links.open {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: rgba(10, 25, 47, 0.95);
+        backdrop-filter: blur(20px);
+        padding: 1.5rem 2rem;
+        gap: 1rem;
+        border-bottom: 1px solid var(--glass-border);
+      }
+      .nav-toggle { display: flex; }
+
+      .hero-stats { gap: 1.5rem; }
+      .hero-stat .number { font-size: 1.6rem; }
+
+      section { padding: 4rem 1.2rem; }
+
+      .modelos-grid { grid-template-columns: 1fr; }
+      .objetivo-grid { grid-template-columns: 1fr; }
+
+      .data-highlights { flex-direction: column; }
+      .data-highlight { min-width: auto; }
+
+      .footer-content {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .hero h1 { font-size: 1.8rem; letter-spacing: -1px; }
+      .hero-subtitle { font-size: 0.9rem; }
+      .section-title { font-size: 1.5rem; }
+      nav { padding: 0.8rem 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================
+       NAVIGATION
+       ============================================ -->
+  <nav id="mainNav">
+    <div class="nav-container">
+      <div class="nav-logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+          <path d="M2 17l10 5 10-5"/>
+          <path d="M2 12l10 5 10-5"/>
+        </svg>
+        SATA · ML
+      </div>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#proposito">Propósito</a></li>
+        <li><a href="#problema">Problema</a></li>
+        <li><a href="#modelos">Modelos</a></li>
+        <li><a href="#variables">Variables</a></li>
+        <li><a href="#metodologia">Metodología</a></li>
+      </ul>
+      <div class="nav-toggle" id="navToggle" aria-label="Menú de navegación" role="button" tabindex="0">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ============================================
+       HERO SECTION
+       ============================================ -->
+  <section class="hero" id="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-particles" id="heroParticles"></div>
+    <div class="hero-grid"></div>
+
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="pulse-dot"></span>
+        Proyecto Final · Talento Tech 2025
+      </div>
+      <h1>Sistema de Alerta Temprana<br><span class="gradient-text">Académica</span></h1>
+      <p class="hero-subtitle">
+        Aplicando modelos de <strong style="color: var(--accent)">Machine Learning</strong> para predecir el rendimiento
+        estudiantil y prevenir la deserción en la educación secundaria colombiana.
+      </p>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <span class="number" data-target="10">0</span>
+          <span class="label">Años de datos</span>
+        </div>
+        <div class="hero-stat">
+          <span class="number" data-target="331787">0</span>
+          <span class="label">Registros</span>
+        </div>
+        <div class="hero-stat">
+          <span class="number" data-target="2314">0</span>
+          <span class="label">Estudiantes</span>
+        </div>
+        <div class="hero-stat">
+          <span class="number" data-target="3">0</span>
+          <span class="label">Modelos ML</span>
+        </div>
+      </div>
+    </div>
+
+    <a href="#proposito" class="hero-scroll-indicator" aria-label="Desplazar hacia abajo">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M7 13l5 5 5-5"/>
+        <path d="M7 6l5 5 5-5"/>
+      </svg>
+    </a>
+  </section>
+
+  <!-- ============================================
+       PROPÓSITO Y OBJETIVO
+       ============================================ -->
+  <section id="proposito">
+    <div class="section-container">
+      <div class="reveal">
+        <span class="section-label">Propósito y Objetivo</span>
+        <h2 class="section-title">Predecir para prevenir,<br>intervenir para transformar</h2>
+        <p class="section-desc">
+          Nuestro objetivo es predecir si un estudiante <strong style="color: var(--accent)">Aprueba</strong> o
+          <strong style="color: var(--warning-orange)">No Aprueba</strong> el ciclo académico a partir de
+          características académicas y demográficas, utilizando técnicas de Machine Learning.
+        </p>
+      </div>
+
+      <div class="objetivo-grid">
+        <div class="glass-card objetivo-card reveal reveal-delay-1">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+          </div>
+          <h3>Metodología CRISP-ML</h3>
+          <p>Seguimos la metodología estándar de la industria para proyectos de Machine Learning, garantizando rigor científico y reproducibilidad en cada fase del proceso.</p>
+        </div>
+
+        <div class="glass-card objetivo-card reveal reveal-delay-2">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+          </div>
+          <h3>Normativa SIEE</h3>
+          <p>Alineado con el Sistema Institucional de Evaluación de Estudiantes colombiano, respetando los criterios de evaluación y promoción vigentes en el país.</p>
+        </div>
+
+        <div class="glass-card objetivo-card reveal reveal-delay-3">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
+          </div>
+          <h3>Datos Reales</h3>
+          <p>10 años de datos reales (2015–2024) de una institución educativa, con 331.787 registros académicos de 2.314 estudiantes de secundaria.</p>
+        </div>
+      </div>
+
+      <div class="data-highlights reveal reveal-delay-4">
+        <div class="data-highlight">
+          <span class="dh-number">2015–2024</span>
+          <span class="dh-label">Período de datos</span>
+        </div>
+        <div class="data-highlight">
+          <span class="dh-number">331.787</span>
+          <span class="dh-label">Registros académicos</span>
+        </div>
+        <div class="data-highlight">
+          <span class="dh-number">2.314</span>
+          <span class="dh-label">Estudiantes analizados</span>
+        </div>
+        <div class="data-highlight">
+          <span class="dh-number">6°–11°</span>
+          <span class="dh-label">Grados escolares</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================
+       EL PROBLEMA EDUCATIVO
+       ============================================ -->
+  <section id="problema">
+    <div class="section-container">
+      <div class="problema-layout">
+        <div class="problema-text reveal">
+          <span class="section-label">El Problema Educativo</span>
+          <h2 class="section-title">La deserción y el fracaso académico en Colombia</h2>
+          <p>
+            En la educación secundaria colombiana (grados 6° a 11°), la reprobación académica y la deserción escolar representan un desafío estructural. Los estudiantes que pierden múltiples asignaturas pueden ser retenidos en el mismo grado, lo que genera desmotivación, rezago y, en muchos casos, abandono definitivo del sistema educativo.
+          </p>
+          <p>
+            La detección tardía de estudiantes en riesgo impide que docentes y directivos tomen acciones oportunas. Sin herramientas predictivas, las intervenciones pedagógicas llegan cuando ya es demasiado tarde.
+          </p>
+          <p>
+            Nuestro sistema utiliza <strong style="color: var(--accent)">Machine Learning</strong> para identificar
+            patrones en el rendimiento estudiantil y generar alertas tempranas que permitan a los educadores intervenir de manera proactiva, antes de que el estudiante fracase.
+          </p>
+          <div class="highlight-box">
+            <p>⚠️ La detección temprana con ML puede reducir significativamente las tasas de reprobación y deserción escolar, transformando datos en oportunidades de intervención pedagógica.</p>
+          </div>
+        </div>
+
+        <div class="problema-visual reveal reveal-delay-2">
+          <div class="visual-circle">
+            <div class="inner-circle">
+              <span class="big-percent">ML</span>
+              <span class="percent-label">Predicción<br>temprana</span>
+            </div>
+            <div class="orbit-item">📊 Notas</div>
+            <div class="orbit-item">📅 Inasistencias</div>
+            <div class="orbit-item">📚 Asignaturas</div>
+            <div class="orbit-item">🔄 Refuerzos</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================
+       MODELOS DE MACHINE LEARNING
+       ============================================ -->
+  <section id="modelos">
+    <div class="section-container">
+      <div class="reveal">
+        <span class="section-label">Modelos de Machine Learning</span>
+        <h2 class="section-title">Tres enfoques, un mismo objetivo</h2>
+        <p class="section-desc">
+          Evaluamos tres algoritmos supervisados para encontrar el modelo con mejor capacidad predictiva
+          sobre el rendimiento académico estudiantil.
+        </p>
+      </div>
+
+      <div class="modelos-grid">
+        <!-- Modelo 1: Regresión Lineal -->
+        <div class="glass-card modelo-card reveal reveal-delay-1">
+          <span class="modelo-number">01</span>
+          <div class="modelo-icon">
+            <svg viewBox="0 0 24 24" fill="none">
+              <line x1="3" y1="20" x2="21" y2="4" stroke-linecap="round"/>
+              <circle cx="6" cy="16" r="2"/>
+              <circle cx="12" cy="12" r="2"/>
+              <circle cx="18" cy="6" r="2"/>
+            </svg>
+          </div>
+          <span class="modelo-type">Regresión</span>
+          <h3>Regresión Lineal</h3>
+          <p>Predice el promedio de notas del estudiante como un valor continuo en la escala de 0.0 a 5.0. Permite estimar cuantitativamente el rendimiento académico esperado.</p>
+          <span class="modelo-tag">Predicción numérica · 0.0 – 5.0</span>
+        </div>
+
+        <!-- Modelo 2: Regresión Logística -->
+        <div class="glass-card modelo-card reveal reveal-delay-2">
+          <span class="modelo-number">02</span>
+          <div class="modelo-icon">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M2 18 C6 18, 8 6, 12 6 S18 6, 22 6" stroke-linecap="round"/>
+              <line x1="2" y1="12" x2="22" y2="12" stroke-dasharray="3,3" opacity="0.4"/>
+            </svg>
+          </div>
+          <span class="modelo-type">Clasificación</span>
+          <h3>Regresión Logística</h3>
+          <p>Clasifica al estudiante en dos categorías: <strong style="color: var(--gradient-1)">Aprueba</strong> o <strong style="color: var(--gradient-1)">No Aprueba</strong>. Calcula la probabilidad de aprobación usando una función sigmoide.</p>
+          <span class="modelo-tag">Clasificación binaria · Aprueba / No Aprueba</span>
+        </div>
+
+        <!-- Modelo 3: Árboles de Decisión -->
+        <div class="glass-card modelo-card reveal reveal-delay-3">
+          <span class="modelo-number">03</span>
+          <div class="modelo-icon">
+            <svg viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="4" r="2.5"/>
+              <circle cx="6" cy="13" r="2.5"/>
+              <circle cx="18" cy="13" r="2.5"/>
+              <circle cx="3" cy="20" r="1.5"/>
+              <circle cx="9" cy="20" r="1.5"/>
+              <circle cx="15" cy="20" r="1.5"/>
+              <circle cx="21" cy="20" r="1.5"/>
+              <line x1="12" y1="6.5" x2="6" y2="10.5"/>
+              <line x1="12" y1="6.5" x2="18" y2="10.5"/>
+              <line x1="6" y1="15.5" x2="3" y2="18.5"/>
+              <line x1="6" y1="15.5" x2="9" y2="18.5"/>
+              <line x1="18" y1="15.5" x2="15" y2="18.5"/>
+              <line x1="18" y1="15.5" x2="21" y2="18.5"/>
+            </svg>
+          </div>
+          <span class="modelo-type">Clasificación</span>
+          <h3>Árboles de Decisión</h3>
+          <p>Clasifica mediante reglas de decisión jerárquicas. Captura patrones no lineales entre las variables, ofreciendo alta interpretabilidad para educadores.</p>
+          <span class="modelo-tag">Reglas interpretables · Patrones no lineales</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================
+       TABLA DE VARIABLES
+       ============================================ -->
+  <section id="variables">
+    <div class="section-container">
+      <div class="reveal">
+        <span class="section-label">Dataset</span>
+        <h2 class="section-title">Variables del modelo</h2>
+        <p class="section-desc">
+          12 variables académicas y demográficas extraídas de los registros institucionales, incluyendo la variable objetivo de clasificación.
+        </p>
+      </div>
+
+      <div class="table-wrapper reveal reveal-delay-1">
+        <table class="variables-table" id="variablesTable">
+          <thead>
+            <tr>
+              <th>Variable</th>
+              <th>Tipo</th>
+              <th>Descripción</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="var-name">grado</td>
+              <td><span class="var-type-badge categorical">Categórica</span></td>
+              <td class="var-desc">Grado escolar (6–11)</td>
+            </tr>
+            <tr>
+              <td class="var-name">promedio_nota</td>
+              <td><span class="var-type-badge numeric">Numérica</span></td>
+              <td class="var-desc">Promedio general de notas (0.0 – 5.0)</td>
+            </tr>
+            <tr>
+              <td class="var-name">intensidad_total_semanal</td>
+              <td><span class="var-type-badge numeric">Numérica</span></td>
+              <td class="var-desc">Horas totales de clase por semana</td>
+            </tr>
+            <tr>
+              <td class="var-name">cantidad_asignaturas</td>
+              <td><span class="var-type-badge numeric">Numérica</span></td>
+              <td class="var-desc">Número de materias cursadas</td>
+            </tr>
+            <tr>
+              <td class="var-name">total_faltas</td>
+              <td><span class="var-type-badge numeric">Numérica</span></td>
+              <td class="var-desc">Total de inasistencias en el año</td>
+            </tr>
+            <tr>
+              <td class="var-name">porc_inasistencia</td>
+              <td><span class="var-type-badge numeric">Numérica</span></td>
+              <td class="var-desc">Porcentaje de inasistencia</td>
+            </tr>
+            <tr>
+              <td class="var-name">materias_perdidas</td>
+              <td><span class="var-type-badge numeric">Numérica</span></td>
+              <td class="var-desc">Cantidad de materias con nota &lt; 3.0</td>
+            </tr>
+            <tr>
+              <td class="var-name">total_refuerzos</td>
+              <td><span class="var-type-badge numeric">Numérica</span></td>
+              <td class="var-desc">Actividades de refuerzo realizadas</td>
+            </tr>
+            <tr>
+              <td class="var-name">nota_minima</td>
+              <td><span class="var-type-badge numeric">Numérica</span></td>
+              <td class="var-desc">Nota más baja obtenida</td>
+            </tr>
+            <tr>
+              <td class="var-name">nota_maxima</td>
+              <td><span class="var-type-badge numeric">Numérica</span></td>
+              <td class="var-desc">Nota más alta obtenida</td>
+            </tr>
+            <tr>
+              <td class="var-name">nota_std</td>
+              <td><span class="var-type-badge numeric">Numérica</span></td>
+              <td class="var-desc">Desviación estándar de notas</td>
+            </tr>
+            <tr>
+              <td class="var-name">promovido_bin</td>
+              <td><span class="var-type-badge target">Binaria (Target)</span></td>
+              <td class="var-desc">1 = Aprobado, 0 = No Aprobado</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================
+       METODOLOGÍA CRISP-ML
+       ============================================ -->
+  <section id="metodologia">
+    <div class="section-container">
+      <div class="reveal">
+        <span class="section-label">Proceso</span>
+        <h2 class="section-title">Metodología CRISP-ML</h2>
+        <p class="section-desc">
+          Siete fases estructuradas que guían el desarrollo del sistema predictivo, desde la comprensión del
+          negocio educativo hasta el monitoreo del modelo en producción.
+        </p>
+      </div>
+
+      <div class="timeline">
+        <!-- Fase 1 -->
+        <div class="timeline-item reveal">
+          <div class="timeline-content">
+            <span class="timeline-phase">Fase 1</span>
+            <h3 class="timeline-title">Comprensión del Negocio</h3>
+            <p class="timeline-desc">Análisis del contexto educativo colombiano, normativa SIEE y definición de objetivos predictivos.</p>
+          </div>
+          <div class="timeline-dot">
+            <svg viewBox="0 0 24 24"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
+          </div>
+          <div class="timeline-content"></div>
+        </div>
+
+        <!-- Fase 2 -->
+        <div class="timeline-item reveal reveal-delay-1">
+          <div class="timeline-content">
+            <span class="timeline-phase">Fase 2</span>
+            <h3 class="timeline-title">Comprensión de los Datos</h3>
+            <p class="timeline-desc">Exploración de 331.787 registros, análisis de distribuciones, correlaciones y calidad de datos.</p>
+          </div>
+          <div class="timeline-dot">
+            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </div>
+          <div class="timeline-content"></div>
+        </div>
+
+        <!-- Fase 3 -->
+        <div class="timeline-item reveal reveal-delay-2">
+          <div class="timeline-content">
+            <span class="timeline-phase">Fase 3</span>
+            <h3 class="timeline-title">Preparación de Datos</h3>
+            <p class="timeline-desc">Limpieza, transformación, ingeniería de características y particionamiento train/test.</p>
+          </div>
+          <div class="timeline-dot">
+            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>
+          </div>
+          <div class="timeline-content"></div>
+        </div>
+
+        <!-- Fase 4 -->
+        <div class="timeline-item reveal reveal-delay-3">
+          <div class="timeline-content">
+            <span class="timeline-phase">Fase 4</span>
+            <h3 class="timeline-title">Modelado</h3>
+            <p class="timeline-desc">Entrenamiento de Regresión Lineal, Logística y Árboles de Decisión con optimización de hiperparámetros.</p>
+          </div>
+          <div class="timeline-dot">
+            <svg viewBox="0 0 24 24"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+          </div>
+          <div class="timeline-content"></div>
+        </div>
+
+        <!-- Fase 5 -->
+        <div class="timeline-item reveal">
+          <div class="timeline-content">
+            <span class="timeline-phase">Fase 5</span>
+            <h3 class="timeline-title">Evaluación</h3>
+            <p class="timeline-desc">Métricas de rendimiento: Accuracy, Precision, Recall, F1-Score, R², MAE y matrices de confusión.</p>
+          </div>
+          <div class="timeline-dot">
+            <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/></svg>
+          </div>
+          <div class="timeline-content"></div>
+        </div>
+
+        <!-- Fase 6 -->
+        <div class="timeline-item reveal reveal-delay-1">
+          <div class="timeline-content">
+            <span class="timeline-phase">Fase 6</span>
+            <h3 class="timeline-title">Despliegue</h3>
+            <p class="timeline-desc">Implementación del modelo seleccionado para uso institucional con interfaz de consulta para educadores.</p>
+          </div>
+          <div class="timeline-dot">
+            <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          </div>
+          <div class="timeline-content"></div>
+        </div>
+
+        <!-- Fase 7 -->
+        <div class="timeline-item reveal reveal-delay-2">
+          <div class="timeline-content">
+            <span class="timeline-phase">Fase 7</span>
+            <h3 class="timeline-title">Monitoreo y Mantenimiento</h3>
+            <p class="timeline-desc">Seguimiento del rendimiento del modelo, detección de drift y re-entrenamiento con nuevos datos anuales.</p>
+          </div>
+          <div class="timeline-dot">
+            <svg viewBox="0 0 24 24"><polyline points="23,6 13.5,15.5 8.5,10.5 1,18"/><polyline points="17,6 23,6 23,12"/></svg>
+          </div>
+          <div class="timeline-content"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================
+       FOOTER
+       ============================================ -->
+  <footer>
+    <div class="footer-content">
+      <div class="footer-left">
+        <div class="footer-logo">
+          <svg viewBox="0 0 24 24" stroke-width="2">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+            <path d="M2 17l10 5 10-5"/>
+            <path d="M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        <div class="footer-text">
+          Proyecto Final · <strong>Talento Tech Colombia</strong>
+        </div>
+      </div>
+      <div class="footer-right">
+        <span class="year">2025</span> · Todos los derechos reservados
+      </div>
+    </div>
+  </footer>
+
+  <!-- ============================================
+       JAVASCRIPT
+       ============================================ -->
+  <script>
+    // ── Navigation Scroll Effect ──
+    const nav = document.getElementById('mainNav');
+    let lastScroll = 0;
+
+    window.addEventListener('scroll', () => {
+      const currentScroll = window.pageYOffset;
+      if (currentScroll > 50) {
+        nav.classList.add('scrolled');
+      } else {
+        nav.classList.remove('scrolled');
+      }
+      lastScroll = currentScroll;
+    });
+
+    // ── Mobile Menu Toggle ──
+    const navToggle = document.getElementById('navToggle');
+    const navLinks = document.getElementById('navLinks');
+
+    navToggle.addEventListener('click', () => {
+      navLinks.classList.toggle('open');
+    });
+
+    // Close menu on link click
+    navLinks.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        navLinks.classList.remove('open');
+      });
+    });
+
+    // ── Particle Generation ──
+    const particlesContainer = document.getElementById('heroParticles');
+    const particleCount = 30;
+
+    for (let i = 0; i < particleCount; i++) {
+      const particle = document.createElement('div');
+      particle.classList.add('particle');
+      const size = Math.random() * 4 + 1;
+      particle.style.width = size + 'px';
+      particle.style.height = size + 'px';
+      particle.style.left = Math.random() * 100 + '%';
+      particle.style.animationDuration = (Math.random() * 15 + 10) + 's';
+      particle.style.animationDelay = (Math.random() * 10) + 's';
+      particlesContainer.appendChild(particle);
+    }
+
+    // ── Counter Animation ──
+    function animateCounters() {
+      const counters = document.querySelectorAll('.hero-stat .number');
+      counters.forEach(counter => {
+        const target = parseInt(counter.getAttribute('data-target'));
+        const duration = 2000;
+        const startTime = performance.now();
+
+        function update(currentTime) {
+          const elapsed = currentTime - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          // Ease out cubic
+          const eased = 1 - Math.pow(1 - progress, 3);
+          const current = Math.round(eased * target);
+
+          if (target > 10000) {
+            counter.textContent = current.toLocaleString('es-CO');
+          } else {
+            counter.textContent = current.toLocaleString('es-CO');
+          }
+
+          if (progress < 1) {
+            requestAnimationFrame(update);
+          }
+        }
+        requestAnimationFrame(update);
+      });
+    }
+
+    // Start counters when hero is visible
+    const heroObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          animateCounters();
+          heroObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.3 });
+
+    heroObserver.observe(document.querySelector('.hero-stats'));
+
+    // ── Scroll Reveal Animation ──
+    const revealElements = document.querySelectorAll('.reveal');
+
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('active');
+        }
+      });
+    }, {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    });
+
+    revealElements.forEach(el => revealObserver.observe(el));
+
+    // ── Smooth Active Link Highlighting ──
+    const sections = document.querySelectorAll('section[id]');
+    const navLinksAll = document.querySelectorAll('.nav-links a');
+
+    const sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const id = entry.target.getAttribute('id');
+          navLinksAll.forEach(link => {
+            link.style.color = '';
+            if (link.getAttribute('href') === '#' + id) {
+              link.style.color = 'var(--accent)';
+            }
+          });
+        }
+      });
+    }, { threshold: 0.3 });
+
+    sections.forEach(section => {
+      if (section.id && section.id !== 'hero') {
+        sectionObserver.observe(section);
+      }
+    });
+  </script>
+
+</body>
+</html>
