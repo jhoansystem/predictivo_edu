@@ -1,0 +1,34 @@
+# ─── Archivos Python ─────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+.env
+.venv/
+venv/
+*.egg-info/
+
+# ─── Jupyter ─────────────────────────────────────────────────
+.ipynb_checkpoints/
+*.ipynb
+
+# ─── Datasets RAW (muy pesados, no los usa app.py) ───────────
+Datasets/Resultados 2015 - 2024.csv
+Datasets/Resultados_2015-2024_limpio.csv
+Datasets/dataset_modelos_aprendizaje.xlsx
+Datasets/dataset_arboles_decision.csv
+Datasets/dataset_regresion_lineal.csv
+
+# ─── Documentos de presentación (no los necesita Streamlit) ──
+*.docx
+*.pptx
+*.pdf
+
+# ─── Archivos del sistema ─────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ─── IDEs ─────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
