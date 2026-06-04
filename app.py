@@ -15,69 +15,295 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Estilo CSS personalizado para apariencia premium
+# Estilo CSS personalizado para apariencia premium (Rediseñado)
 st.markdown("""
 <style>
-    /* Estilos generales */
-    .main {
-        background-color: #0a192f;
-        color: #ccd6f6;
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+    /* ── BASE ── */
+    html, body, [class*="css"] {
+        font-family: 'Inter', sans-serif !important;
     }
     .stApp {
-        background-color: #0a192f;
+        background: linear-gradient(160deg, #060f1e 0%, #0a192f 50%, #0d2137 100%) !important;
+        min-height: 100vh;
     }
-    
-    /* Títulos y textos */
+    .main .block-container {
+        padding-top: 2rem;
+    }
+
+    /* ── TEXTOS GENERALES ── */
+    p, li, span, .stMarkdown p {
+        color: #a8b2d8 !important;
+        font-size: 1rem;
+        line-height: 1.7;
+    }
     h1, h2, h3, h4, h5, h6 {
         color: #e6f1ff !important;
-        font-family: 'Inter', sans-serif;
+        font-family: 'Inter', sans-serif !important;
+        font-weight: 700 !important;
     }
-    .stMarkdown p {
-        color: #8892b0;
-        font-size: 1.05rem;
+    strong, b {
+        color: #ccd6f6 !important;
     }
-    
-    /* Contenedores y Tarjetas */
+    a { color: #64ffda !important; }
+
+    /* ── SIDEBAR ── */
+    section[data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #0b1d35 0%, #112240 100%) !important;
+        border-right: 1px solid rgba(100,255,218,0.12) !important;
+    }
+    section[data-testid="stSidebar"] p,
+    section[data-testid="stSidebar"] span,
+    section[data-testid="stSidebar"] li,
+    section[data-testid="stSidebar"] .stMarkdown p {
+        color: #8892b0 !important;
+    }
+    section[data-testid="stSidebar"] strong,
+    section[data-testid="stSidebar"] b {
+        color: #ccd6f6 !important;
+    }
+
+    /* ── RADIO NAV (sidebar) ── */
+    /* Etiqueta del grupo "Navegación" */
+    section[data-testid="stSidebar"] .stRadio > label > div > p {
+        color: #64ffda !important;
+        font-size: 0.72rem !important;
+        font-weight: 700 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 2px !important;
+        margin-bottom: 0.4rem !important;
+    }
+    /* Cada ítem de radio */
+    section[data-testid="stSidebar"] div[role="radiogroup"] label {
+        color: #a8b2d8 !important;
+        font-size: 0.93rem !important;
+        font-weight: 500 !important;
+        padding: 6px 10px !important;
+        border-radius: 7px !important;
+        margin: 2px 0 !important;
+        transition: all 0.2s !important;
+        cursor: pointer !important;
+    }
+    section[data-testid="stSidebar"] div[role="radiogroup"] label:hover {
+        background: rgba(100,255,218,0.07) !important;
+        color: #64ffda !important;
+    }
+    /* Círculo del radio seleccionado */
+    section[data-testid="stSidebar"] div[role="radiogroup"] [data-baseweb="radio"] div {
+        border-color: #64ffda !important;
+    }
+    section[data-testid="stSidebar"] div[role="radiogroup"] [aria-checked="true"] div {
+        background-color: #64ffda !important;
+        border-color: #64ffda !important;
+    }
+
+    /* ── MÉTRICAS ── */
+    div[data-testid="metric-container"] {
+        background: rgba(17,34,64,0.85) !important;
+        border: 1px solid rgba(100,255,218,0.14) !important;
+        border-radius: 14px !important;
+        padding: 1.2rem 1.4rem !important;
+        backdrop-filter: blur(8px) !important;
+        transition: border-color 0.2s !important;
+    }
+    div[data-testid="metric-container"]:hover {
+        border-color: rgba(100,255,218,0.35) !important;
+    }
     div[data-testid="stMetricValue"] {
         color: #64ffda !important;
-        font-size: 2.5rem;
-        font-weight: 800;
+        font-size: 2.1rem !important;
+        font-weight: 800 !important;
     }
     div[data-testid="stMetricLabel"] {
         color: #8892b0 !important;
-        text-transform: uppercase;
-        font-size: 0.8rem;
-        letter-spacing: 1px;
+        text-transform: uppercase !important;
+        font-size: 0.75rem !important;
+        letter-spacing: 1.2px !important;
     }
-    .css-1r6g72h, .stAlert {
-        border-radius: 12px;
+
+    /* ── BOTONES ── */
+    .stButton > button {
+        background: transparent !important;
+        color: #64ffda !important;
+        border: 1.5px solid #64ffda !important;
+        padding: 0.55rem 2rem !important;
+        border-radius: 8px !important;
+        font-weight: 600 !important;
+        font-size: 0.9rem !important;
+        letter-spacing: 0.4px !important;
+        transition: all 0.25s ease !important;
     }
-    
-    /* Botones y formularios */
-    .stButton>button {
-        background-color: transparent;
-        color: #64ffda;
-        border: 1.5px solid #64ffda;
-        padding: 0.6rem 2rem;
-        border-radius: 8px;
-        font-weight: 600;
-        transition: all 0.3s ease;
+    .stButton > button:hover {
+        background: rgba(100,255,218,0.1) !important;
+        box-shadow: 0 4px 18px rgba(100,255,218,0.22) !important;
+        transform: translateY(-1px) !important;
     }
-    .stButton>button:hover {
-        background-color: rgba(100, 255, 218, 0.1);
-        color: #64ffda;
-        border-color: #64ffda;
-        box-shadow: 0 4px 15px rgba(100, 255, 218, 0.2);
+
+    /* ── SELECTBOX / DROPDOWN ── */
+    .stSelectbox label,
+    .stSelectbox > label {
+        color: #8892b0 !important;
+        font-size: 0.8rem !important;
+        font-weight: 600 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.9px !important;
     }
-    
-    /* Barra lateral */
-    section[data-testid="stSidebar"] {
-        background-color: #112240;
-        border-right: 1px solid rgba(100, 255, 218, 0.1);
+    .stSelectbox div[data-baseweb="select"] > div {
+        background-color: #112240 !important;
+        border: 1px solid rgba(100,255,218,0.22) !important;
+        border-radius: 9px !important;
+        color: #e6f1ff !important;
     }
-    section[data-testid="stSidebar"] .stMarkdown p {
-        color: #ccd6f6;
+    .stSelectbox div[data-baseweb="select"] > div:hover {
+        border-color: #64ffda !important;
     }
+    /* Texto seleccionado dentro del dropdown */
+    .stSelectbox div[data-baseweb="select"] span {
+        color: #e6f1ff !important;
+    }
+    /* Lista desplegable */
+    ul[data-baseweb="menu"] {
+        background-color: #112240 !important;
+        border: 1px solid rgba(100,255,218,0.2) !important;
+        border-radius: 9px !important;
+    }
+    ul[data-baseweb="menu"] li {
+        color: #ccd6f6 !important;
+        background-color: transparent !important;
+    }
+    ul[data-baseweb="menu"] li:hover {
+        background-color: rgba(100,255,218,0.08) !important;
+        color: #64ffda !important;
+    }
+
+    /* ── NUMBER INPUT ── */
+    .stNumberInput label {
+        color: #8892b0 !important;
+        font-size: 0.8rem !important;
+        font-weight: 600 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.7px !important;
+    }
+    .stNumberInput input {
+        background-color: #112240 !important;
+        border: 1px solid rgba(100,255,218,0.2) !important;
+        border-radius: 8px !important;
+        color: #e6f1ff !important;
+        font-size: 1rem !important;
+        font-weight: 500 !important;
+    }
+    .stNumberInput input:focus {
+        border-color: #64ffda !important;
+        box-shadow: 0 0 0 2px rgba(100,255,218,0.1) !important;
+    }
+    .stNumberInput button {
+        background: rgba(100,255,218,0.06) !important;
+        border-color: rgba(100,255,218,0.15) !important;
+        color: #64ffda !important;
+    }
+
+    /* ── SLIDER ── */
+    .stSlider label {
+        color: #8892b0 !important;
+        font-size: 0.8rem !important;
+        font-weight: 600 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.7px !important;
+    }
+    .stSlider [data-baseweb="slider"] [role="slider"] {
+        background-color: #64ffda !important;
+        border-color: #64ffda !important;
+        box-shadow: 0 0 0 4px rgba(100,255,218,0.18) !important;
+    }
+    .stSlider [data-baseweb="slider"] div[data-testid="stTickBarMin"],
+    .stSlider [data-baseweb="slider"] div[data-testid="stTickBarMax"] {
+        color: #8892b0 !important;
+    }
+
+    /* ── FORMULARIO ── */
+    div[data-testid="stForm"] {
+        background: rgba(11,29,53,0.7) !important;
+        border: 1px solid rgba(100,255,218,0.12) !important;
+        border-radius: 14px !important;
+        padding: 1.8rem !important;
+        backdrop-filter: blur(10px) !important;
+    }
+
+    /* ── DATAFRAME / TABLA ── */
+    .stDataFrame {
+        border: 1px solid rgba(100,255,218,0.12) !important;
+        border-radius: 10px !important;
+        overflow: hidden !important;
+    }
+    .stDataFrame th {
+        background-color: #112240 !important;
+        color: #64ffda !important;
+        font-weight: 600 !important;
+    }
+    .stDataFrame td {
+        color: #ccd6f6 !important;
+        background-color: rgba(10,25,47,0.6) !important;
+    }
+
+    /* ── ALERTAS ── */
+    div[data-testid="stAlert"][data-type="success"],
+    .stSuccess {
+        background: rgba(16,185,129,0.1) !important;
+        border: 1px solid rgba(16,185,129,0.35) !important;
+        border-radius: 10px !important;
+        color: #6ee7b7 !important;
+    }
+    div[data-testid="stAlert"][data-type="warning"],
+    .stWarning {
+        background: rgba(245,158,11,0.1) !important;
+        border: 1px solid rgba(245,158,11,0.35) !important;
+        border-radius: 10px !important;
+        color: #fcd34d !important;
+    }
+    div[data-testid="stAlert"][data-type="error"],
+    .stError {
+        background: rgba(239,68,68,0.1) !important;
+        border: 1px solid rgba(239,68,68,0.35) !important;
+        border-radius: 10px !important;
+    }
+
+    /* ── BARRA DE PROGRESO ── */
+    .stProgress > div > div > div > div {
+        background: linear-gradient(90deg, #64ffda, #00bfa5) !important;
+        border-radius: 10px !important;
+    }
+    .stProgress > div > div > div {
+        background: rgba(100,255,218,0.08) !important;
+        border-radius: 10px !important;
+    }
+
+    /* ── EXPANDER ── */
+    details {
+        background: rgba(17,34,64,0.5) !important;
+        border: 1px solid rgba(100,255,218,0.1) !important;
+        border-radius: 9px !important;
+    }
+    details summary {
+        color: #a8b2d8 !important;
+        font-weight: 500 !important;
+        padding: 0.6rem 1rem !important;
+    }
+    details summary:hover {
+        color: #64ffda !important;
+    }
+
+    /* ── DIVISORES ── */
+    hr {
+        border-color: rgba(100,255,218,0.1) !important;
+        margin: 1.5rem 0 !important;
+    }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width: 7px; height: 7px; }
+    ::-webkit-scrollbar-track { background: #060f1e; }
+    ::-webkit-scrollbar-thumb { background: #233554; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #2d4373; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -86,32 +312,45 @@ st.markdown("""
 def cargar_datos():
     try:
         # Cargamos el dataset de Regresión Logística que contiene la mayoría de las columnas de agregación
-        df = pd.read_csv('dataset_regresion_logistica.csv')
+        df = pd.read_csv('Datasets/dataset_regresion_logistica.csv')
         return df
     except Exception as e:
         st.error(f"Error al cargar el dataset: {e}")
         return None
 
 # Función para cargar modelos
+def _patch_sklearn_compat(model):
+    """Parche de compatibilidad para modelos guardados con scikit-learn < 1.5.
+    La versión 1.5+ eliminó el atributo 'multi_class' de LogisticRegression."""
+    from sklearn.linear_model import LogisticRegression
+    if isinstance(model, LogisticRegression):
+        if not hasattr(model, 'multi_class'):
+            model.multi_class = 'auto'
+        if not hasattr(model, 'l1_ratio'):
+            model.l1_ratio = None
+    return model
+
 def cargar_modelo(tipo):
     try:
         if tipo == 'logistica':
-            model = joblib.load('modelos/modelo_regresion_logistica.joblib')
-            scaler = joblib.load('modelos/scaler_regresion_logistica.joblib')
-            features = joblib.load('modelos/features_regresion_logistica.joblib')
+            model = joblib.load('Modelos/modelo_regresion_logistica.joblib')
+            model = _patch_sklearn_compat(model)
+            scaler = joblib.load('Modelos/scaler_regresion_logistica.joblib')
+            features = joblib.load('Modelos/features_regresion_logistica.joblib')
             return model, scaler, features
         elif tipo == 'arbol':
-            model = joblib.load('modelos/modelo_arbol_decision.joblib')
-            features = joblib.load('modelos/features_arbol_decision.joblib')
+            model = joblib.load('Modelos/modelo_arbol_decision.joblib')
+            features = joblib.load('Modelos/features_arbol_decision.joblib')
             return model, None, features
         elif tipo == 'lineal':
-            model = joblib.load('modelos/modelo_regresion_lineal.joblib')
-            scaler = joblib.load('modelos/scaler_regresion_lineal.joblib')
-            features = joblib.load('modelos/features_regresion_lineal.joblib')
+            model = joblib.load('Modelos/modelo_regresion_lineal.joblib')
+            scaler = joblib.load('Modelos/scaler_regresion_lineal.joblib')
+            features = joblib.load('Modelos/features_regresion_lineal.joblib')
             return model, scaler, features
     except Exception as e:
         st.error(f"Error al cargar el modelo o componentes: {e}")
         return None, None, None
+
 
 # Cargar dataset base
 df = cargar_datos()
